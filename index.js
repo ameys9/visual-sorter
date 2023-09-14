@@ -19,8 +19,7 @@ function createArray() {
   let array = new Array(numbars);
   for (let i = 0; i < numbars; i++) {
     array[i] = randomnum(min, max);
-}
-
+  }
   return array;
 }
 
@@ -92,13 +91,85 @@ async function bubbleSort(array) {
   return array;
 }
 
-sortbtn.addEventListener("click", function () {
+async function insertionSort(array) {
+  let bars = document.getElementsByClassName("bar");
+  for (let i = 1; i < array.length; i++) {
+    let key = array[i];
+    let j = i - 1;
+    while (j >= 0 && array[j] > key) {
+      for (let k = 0; k < bars.length; k++) {
+        if (k !== j && k !== i) {
+          bars[k].style.backgroundColor = "pink";
+        }
+      }
+      array[j + 1] = array[j];
+      bars[j + 1].style.height = array[j + 1] * heightfactor + "px";
+      bars[j + 1].style.backgroundColor = "yellow";
+      j = j - 1;
+      await sleep(speedfactor);
+    }
+    array[j + 1] = key;
+    bars[j + 1].style.height = key * heightfactor + "px";
+    bars[j + 1].style.backgroundColor = "yellow";
+  }
+  return array;
+}
+
+
+
+async function quickSort(array, low, high) {
+  if (low < high) {
+    const pivotIndex = await partition(array, low, high);
+    await quickSort(array, low, pivotIndex - 1);
+    await quickSort(array, pivotIndex + 1, high);
+  }
+}
+
+async function partition(array, low, high) {
+  let pivot = array[high];
+  let bars = document.getElementsByClassName("bar");
+  let i = low - 1;
+
+  for (let j = low; j < high; j++) {
+    if (array[j] < pivot) {
+      i++;
+      [array[i], array[j]] = [array[j], array[i]];
+
+      for (let k = 0; k < bars.length; k++) {
+        if (k !== i && k !== j) {
+          bars[k].style.backgroundColor = "pink";
+        }
+      }
+
+      bars[i].style.height = array[i] * heightfactor + "px";
+      bars[j].style.height = array[j] * heightfactor + "px";
+
+      await sleep(speedfactor);
+    }
+  }
+
+  [array[i + 1], array[high]] = [array[high], array[i + 1]];
+
+  bars[i + 1].style.height = array[i + 1] * heightfactor + "px";
+  bars[high].style.height = array[high] * heightfactor + "px";
+
+  return i + 1;
+}
+
+sortbtn.addEventListener("click", async function () {
   switch (algosort) {
     case "bubble":
-      bubbleSort(unsortedarray);
+      await bubbleSort(unsortedarray);
+      break;
+    case "insertion":
+      await insertionSort(unsortedarray);
+      break;
+    
+    case "quick":
+      await quickSort(unsortedarray, 0, unsortedarray.length - 1);
       break;
     default:
-      bubbleSort(unsortedarray);
+      await bubbleSort(unsortedarray);
       break;
   }
 });
